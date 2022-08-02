@@ -1,14 +1,22 @@
 import React from 'react'
 import Child from './Child'
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 const Parent = () => {
-    const profile = useSelector((state) => state.profile); // Return All Store - readonly
+    const { todo, counter } = useSelector((state) => state); // Return All Store - readonly
+    const dispatch = useDispatch(); // Write data to store
 
-    console.log(profile);
+    console.log(todo);
 
     return (
         <div>
+            <div>
+                <h4>Parent</h4>
+                <button onClick={() => dispatch({ type: "ADD_TODO", payload: counter})}>Add to list</button>
+                {todo.map((t, index) => {
+                    return <p key={index}>{t}</p>
+                })}
+            </div>
             <Child />
         </div>
     )

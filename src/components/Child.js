@@ -1,13 +1,19 @@
 import React from 'react'
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 const Child = () => {
-    const todo = useSelector((state) => state); // Return All Store - readonly
+    const store = useSelector((state) => state); // Return All Store - readonly
+    const dispatch = useDispatch(); // Write data to store
 
-    console.log(todo);
+    console.log(store);
 
     return (
-        <div>Child</div>
+        <div>
+            Child
+            <div>{store.counter}</div>
+            <button onClick={() => dispatch({type: "INC"})}>Increment</button>    
+            <button onClick={() => dispatch({type: "DEC"})}>Decrement</button>    
+        </div>
     )
 }
 
