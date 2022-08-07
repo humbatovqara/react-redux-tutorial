@@ -1,10 +1,12 @@
 import './App.css';
-import Grandparent from './components/Grandparent';
+import TodoWindow from './pages/TodoWindow';
+// import Grandparent from './components/Grandparent';
 
 function App() {
   return (
     <div className="App">
-      <Grandparent />
+      {/* <Grandparent /> */}
+      <TodoWindow />
     </div>
   );
 }
