@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import {
     Container,
@@ -16,24 +16,14 @@ import {
 
 import { useForm, Controller } from "react-hook-form";
 import { useSelector, useDispatch } from 'react-redux';
-import { asyncGetEmp } from '../redux/reducers/employeeReducer';
+import { asyncGetEmp, asyncPostEmp } from '../redux/reducers/employeeReducer';
 
-/* function createData(name, surname, job) {
-    return { name, surname, job };
-}
-
-const rows = [
-    createData('Leanne', 'Graham', 'Engineer'),
-    createData('Ervin', 'Howell', 'Engineer'),
-    createData('Patricia', 'Lebsack', 'Engineer'),
-]; */
 
 const Second = () => {
     const { employee } = useSelector((state) => state); // Return All Store - readonly
     const dispatch = useDispatch(); // Write data to store
 
     console.log(employee);
-    // const [newArr, setNewArr] = useState(rows);
 
     const { control, handleSubmit } = useForm({
         defaultValues: {
@@ -45,9 +35,7 @@ const Second = () => {
 
     const onSubmit = data => {
         console.log(data)
-        // const newArra = [...newArr, createData(data.name, data.surname, data.job)]
-        // setNewArr(newArra)
-        // dispatch(asyncGetEmp())
+        dispatch(asyncPostEmp(data))
     }
 
     useEffect(() => {
