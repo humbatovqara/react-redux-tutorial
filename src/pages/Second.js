@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
     Container,
@@ -11,21 +11,34 @@ import {
     TableHead,
     TableRow,
     TableCell,
-    TableBody
+    tableCellClasses,
+    TableBody,
+    styled,
+    ButtonGroup
 } from '@mui/material';
 
 import { useForm, Controller } from "react-hook-form";
 import { useSelector, useDispatch } from 'react-redux';
-import { asyncGetEmp, asyncPostEmp } from '../redux/reducers/employeeReducer';
+import { addEmployee, deleteEmployee, getSingleEmployee, loadEmployees, updateEmployee } from '../redux/actions/employeeAction';
 
+// STYLED
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+        backgroundColor: theme.palette.common.black,
+        color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.body}`]: {
+        fontSize: 14,
+    },
+}));
 
 const Second = () => {
-    const { employee } = useSelector((state) => state); // Return All Store - readonly
+    const [changeRequest, setChangeRequest] = useState(true);
+    const [id, setId] = useState("");
+    const { employees, employee } = useSelector((state) => state.employee); // Return All Store - readonly
     const dispatch = useDispatch(); // Write data to store
 
-    console.log(employee);
-
-    const { control, handleSubmit } = useForm({
+    const { control, handleSubmit, setValue } = useForm({
         defaultValues: {
             name: '',
             surname: '',
@@ -34,18 +47,48 @@ const Second = () => {
     });
 
     const onSubmit = data => {
-        console.log(data)
-        dispatch(asyncPostEmp(data))
+        if (changeRequest) {
+            dispatch(addEmployee(data))
+            setValue("name", "")
+            setValue("surname", "")
+            setValue("job", "")
+        }
+        else {
+            dispatch(updateEmployee(data, id))
+            setChangeRequest(!changeRequest)
+            setValue("name", "")
+            setValue("surname", "")
+            setValue("job", "")
+        }
     }
 
     useEffect(() => {
-        dispatch(asyncGetEmp())
-    }, [])
+        dispatch(loadEmployees());
+    }, []);
+
+    useEffect(() => {
+        setValue("name", employee.name)
+        setValue("surname", employee.surname)
+        setValue("job", employee.job)
+    }, [employee])
+
+    const handleDelete = (id) => {
+        if (window.confirm("Are you sure wanted to delete the employee ?")) {
+            dispatch(deleteEmployee(id))
+        }
+    };
+
+    const handleEdit = (id) => {
+        console.log(id)
+        setChangeRequest(false);
+        setId(id);
+        dispatch(getSingleEmployee(id));
+    }
 
     return (
         <Container maxWidth="lg">
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Grid container spacing={2}>
+                <Grid container spacing={2} marginBottom={2}>
                     <Grid item xs={4}>
                         <Controller name='name' control={control}
                             render={({ field }) => (
@@ -67,7 +110,9 @@ const Second = () => {
                             )}
                         />
                     </Grid>
-                    <Button type="submit">Login</Button>
+                    <Grid item xs={12}>
+                        <Button variant="outlined" type="submit">ADD EMPLOYEE</Button>
+                    </Grid>
                 </Grid>
             </form>
 
@@ -75,22 +120,29 @@ const Second = () => {
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Surname</TableCell>
-                            <TableCell>Job description</TableCell>
+                            <StyledTableCell align='center'>Name</StyledTableCell>
+                            <StyledTableCell align='center'>Surname</StyledTableCell>
+                            <StyledTableCell align='center'>Job description</StyledTableCell>
+                            <StyledTableCell align='center'></StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {employee.map((row, index) => (
+                        {employees && employees.map((emp) => (
                             <TableRow
-                                key={index}
+                                key={emp.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
-                                <TableCell component="th" scope="row">
-                                    {row.name}
+                                <TableCell component="th" scope="row" align='center'>
+                                    {emp.name}
                                 </TableCell>
-                                <TableCell>{row.surname}</TableCell>
-                                <TableCell>{row.job}</TableCell>
+                                <TableCell align='center'>{emp.surname}</TableCell>
+                                <TableCell align='center'>{emp.job}</TableCell>
+                                <TableCell align='center' >
+                                    <ButtonGroup variant="contained" aria-label="outlined button group">
+                                        <Button color="error" onClick={() => handleDelete(emp.id)}>Delete</Button>
+                                        <Button color="primary" onClick={() => handleEdit(emp.id)}>Edit</Button>
+                                    </ButtonGroup>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

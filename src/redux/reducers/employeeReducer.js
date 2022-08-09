@@ -1,44 +1,35 @@
-import axios from "axios";
+import * as types from '../actions/actionType';
 
-const initialEmployee = [];
+const initialState = {
+    employees: [],
+    employee: {},
+    loading: true
+};
 
-const employeeReducer = (state = initialEmployee, action) => {
+const employeeReducer = (state = initialState, action) => {
     switch (action.type) {
-        case "GET_EMPLOYEES":
-            {
-                const newArr = [...state, ...action.payload];
-                // console.log(action.payload)
-                return newArr;
+        case types.GET_EMPLOYEES:
+            return {
+                ...state,
+                employees: action.payload,
+                loading: false,
             }
-        case "POST_EMPLOYEES":
-            {
-                const emp = state.employee.concat(action.payload)
-                console.log(state.employee)
-                return { ...state, emp }
+        case types.DELETE_EMPLOYEE:
+        case types.ADD_EMPLOYEE:
+        case types.UPDATE_EMPLOYEE:
+            return {
+                ...state,
+                loading: false
+            }
+        case types.GET_SINGLE_EMPLOYEE:
+            return {
+                ...state,
+                employee: action.payload,
+                loading: false
             }
         default:
             return state;
     }
 };
-
-export const asyncGetEmp = () => {
-    return async (dispatch) => {
-        await axios("http://localhost:3002/employees")
-            .then(response => {
-                dispatch({ type: "GET_EMPLOYEES", payload: response.data })
-            })
-    };
-}
-
-export const asyncPostEmp = (empObj) => {
-    return (dispatch) => {
-        axios.post("http://localhost:3002/employees", empObj)
-            .then(response => {
-                console.log(response.data)
-                dispatch({ type: "POST_EMPLOYEES", payload: response.data })
-            })
-            .catch(error => { console.log(error) })
-    }
-}
 
 export default employeeReducer;
